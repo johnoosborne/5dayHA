@@ -1,0 +1,25 @@
+Supplement X. Power simulation.
+
+#install.packages("simr")
+library(simr)
+
+# Create dataset with participants (ID), condition and test
+ID <- 1:8
+condition <- letters[1:2]
+test <- letters[1:2]
+data <- expand.grid(ID = ID, condition = condition, test = test)
+
+# Specify fixed and random parameters
+b <- c(2100, 0, -21, -84) # 2% on 2100 seconds for training; additional 3% with heat training
+s <- 40 # Residual standard deviation
+
+# Random intercept
+sd_random_inter <- 150
+V_mat = sd_random_inter^2
+
+# Model
+model1 <- makeLmer(y ~ condition*test + (1|ID), fixef = b, VarCorr = V_mat, sigma = s, data = data)
+print(model1)
+
+# Simulation
+powerSim(model1, test = fixed("condition:test"), nsim = 1000) # Change number of sims for greater precision
